@@ -22,6 +22,7 @@ const pet = {
 const PetProfile = () => {
     //const petAPI = useAxiosPrivate()
 
+    let accessa = '';
     const {id} = useParams()
     const [data, setData] = useState({})
     const [erraa, setErraa] = useState(false);
@@ -34,46 +35,57 @@ const PetProfile = () => {
         const getUsers = async () => {
             try {
                 const response = await petAPI.get(`/animals/${id}`
-                /* ,{
+                ,{
                     headers:{
-                        Authorization: `Bearer ${auth.access}`
-                }} */);
+                        Authorization: `Bearer ${process.env.REACT_APP_ACCESS_TOKEN}`
+                }});
                 setData(response?.data.animal)
                 console.log(response?.data.animal);
                 //console.log(process.env.REACT_APP_ACCESS_TOKEN);
                 /* isMounted && setUsers(response.data); */
             } catch (err) {
-                setData(pet)
-                /* console.log(auth.access)
+                console.log(auth.access)
                 console.error(err);
                 setErraa(true)
                 const resendTokenRequest = async () => {
                     try {
                         const response = await api.post('https://api.petfinder.com/v2/oauth2/token', {
                             grant_type: 'client_credentials',
-                            client_id: 'YY7EZUrJOSmIqkDcjmO2rRuzQWdoJ7qEkICwfD4gwGC0HPsVcX',
-                            client_secret: 'i79H3eEo0eYtgF2mXYu5KkfMr9VwC08ngRctviTs'
+                            client_id: 'JTmW0pVdSxBIqTlKRded20EwHwMC34dKFPDJugQi3wOMlOPCxm',
+                            client_secret: 'zXksawaY84DckTRLAGdxWlTU9yM1Ekt5thRakvhN'
                         });
+
                         setAuth((prev)=>({...prev, access:response.data.access_token}))
+                        accessa = response.data.access_token;
                         console.log(response.data.access_token)
+                        console.log( `accessa: ${accessa}`);
                         setAccess(response.data.access_token)
-                        console.log(auth);
+                        console.log(auth.access);
                     } catch (error) {
                         console.error(error);
                     }
                 };
 
-                resendTokenRequest()
-                if(erraa){
-                    const response2 = await petAPI.get('/animals', {
-                        headers: {
-                            Authorization: `Bearer ${auth.access}`
-                        }
-                    });
-                    setData(response2?.data);
-                    console.log(response2?.data);
-        
-                } */
+                await resendTokenRequest();
+                
+               
+                setTimeout(async () => {
+                    try{const response = await petAPI.get(`/animals/${id}`
+                    ,{
+                        headers:{
+                            Authorization: `Bearer ${accessa}`
+                    }});
+                    setData(response?.data.animal)
+                    console.log(response?.data.animal);
+                    }
+                    catch(err){
+                        console.log(err);
+                    }
+                    }, 0
+                )
+
+                
+                
             }
         }
 
@@ -82,6 +94,7 @@ const PetProfile = () => {
         return () => {
             isMounted = false;
         }
+
     }, [/* auth.access, setAuth */])
 
   return (
@@ -95,7 +108,9 @@ const PetProfile = () => {
         <div className='pt-5  w-full '>
           <div className='flex flex-col justify-center items-center md:flex-row md:justify-between md:max-w-screen-md mx-auto'>
             <div className='max-w-[350px]'>
-                <img src={(data?.photos)?data?.photos[0]?.large:paw} alt="" />
+                {data?.photo&&<img src={(data?.photos)?data?.photos[0]?.large:paw} alt="" />}
+                {!data?.photo&&<img src={paw} alt="" />}
+                
             </div>
             <div className='max-w-screen-sm'>
                 <p className='font-bold'>Breed</p>

@@ -10,6 +10,7 @@ import useAuth from '../hooks/useAuth'
 
 const PetListing = () => {
     //const petAPI = useAxiosPrivate()
+    let accessa = '';
     const [page, nexPage] =  useState(1)
 
     const [data, setData] = useState({})
@@ -22,45 +23,54 @@ const PetListing = () => {
 
         const getUsers = async () => {
             try {
-                const response = await petAPI.get(`/animals`/* ,{
+                const response = await petAPI.get(`/animals`,{
                     headers:{
                         Authorization: `Bearer ${auth.access}`
-                }} */);
+                }});
                 setData(response?.data)
                 console.log(response?.data);
                 //console.log(process.env.REACT_APP_ACCESS_TOKEN);
                 /* isMounted && setUsers(response.data); */
             } catch (err) {
-                /* console.log(auth.access)
+                console.log(auth.access)
                 console.error(err);
                 setErraa(true)
                 const resendTokenRequest = async () => {
                     try {
                         const response = await api.post('https://api.petfinder.com/v2/oauth2/token', {
                             grant_type: 'client_credentials',
-                            client_id: 'YY7EZUrJOSmIqkDcjmO2rRuzQWdoJ7qEkICwfD4gwGC0HPsVcX',
-                            client_secret: 'i79H3eEo0eYtgF2mXYu5KkfMr9VwC08ngRctviTs'
+                            client_id: 'JTmW0pVdSxBIqTlKRded20EwHwMC34dKFPDJugQi3wOMlOPCxm',
+                            client_secret: 'zXksawaY84DckTRLAGdxWlTU9yM1Ekt5thRakvhN'
                         });
+
                         setAuth((prev)=>({...prev, access:response.data.access_token}))
+                        accessa = response.data.access_token;
                         console.log(response.data.access_token)
+                        console.log( `accessa: ${accessa}`);
                         setAccess(response.data.access_token)
-                        console.log(auth);
+                        console.log(auth.access);
                     } catch (error) {
                         console.error(error);
                     }
                 };
 
-                resendTokenRequest()
-                if(erraa){
-                    const response2 = await petAPI.get('/animals', {
-                        headers: {
-                            Authorization: `Bearer ${auth.access}`
-                        }
-                    });
-                    setData(response2?.data);
-                    console.log(response2?.data);
-        
-                } */
+                await resendTokenRequest()
+                setTimeout(async () => {
+                  try{const response = await petAPI.get(`/animals`
+                  ,{
+                      headers:{
+                          Authorization: `Bearer ${accessa}`
+                  }});
+                  setData(response?.data)
+                  console.log(response?.data);
+                  }
+                  catch(err){
+                      console.log(err);
+                  }
+                  }, 0
+              )
+
+                
             }
         }
 
@@ -114,7 +124,7 @@ const PetListing = () => {
                 {animal.photos[0]&&
                 (<div>
                     <Link to={`/${animal.id}`} target='_blank' rel="noreferrer">
-                    <img src={animal.photos[0]?.medium}                         className='max-height-25' alt="" />
+                    <img src={animal.photos[0]?.medium}                        className='max-h-[250px]' alt="" />
                     </Link>
                 </div>)
                 }
